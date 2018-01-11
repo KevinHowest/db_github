@@ -1,0 +1,85 @@
+All experiment equipment purchased after 1st of January 1985
+SELECT eq_name,purchase_date FROM equipment WHERE YEAR(purchase_date) > 1984; => FOUT
+
+All lab members born in April
+SELECT firstname, lastname FROM lab_members WHERE MONTH(birth_date) = 4;
+
+The number of experiments each lab member conducted
+SELECT count(*), firstname, lastname FROM experiment JOIN lab_members ON experiment.performed_by=lab_members.members_id GROUP BY members_id;
+
+A list with all equipment used in a successful experiment
+SELECT eq_name FROM equipment JOIN experiment ON experiment.equipment_id=equipment.equipment_id JOIN results ON results.experiment=experiment.experiment_id WHERE results.status = "COMPLETED" GROUP BY equipment.equipment_id;
+
+A list with all lab members that failed an experiment
+SELECT firstname, lastname FROM lab_members JOIN experiment ON experiment.performed_by=lab_members.members_id JOIN results ON results.experiment=experiment.experiment_id WHERE results.status = "FAILED";
+
+Who followed wich trainings?
+SELECT firstname, lastname, subject FROM lab_members JOIN members_in_training ON lab_members.members_id=members_in_training.members_id JOIN trainings ON  members_in_training.training_id=trainings.training_id;
+
+
+MYSQL workbench:
+	normalisation-example
+	*Why is this table not 1NF? Niet-atomaire elementen (meerdere elementen per kolom)
+	*Normalize up to 3NF:
+		UNF 	Branch(branchNO, branchAddress, telNos)
+		1NF 	Branch(branchNO, branchAddress) => primary key: branchNO
+				Branch(branchNo, telNo) => primary key: telNo, foreign key: branchNO to branchNO ^
+		2NF	1NF (2NF = alle atributen afhankelijk van een key)
+		3NF	2NF (3NF = atributen die niet behoren tot een sleuten mogen niet afheangen van een andere sleuten)
+
+Exercises:
+	normalise up to 3NF:
+		UNF	pet(pet_id, pet_name, pet_type, pet_age, owner, (visit_date, procedure_no, procedure_name)) {tussen () betekent repeating group}
+		1NF	pet(pet_id, pet_name, pet_type, pet_age, owner) => primary: pet_id
+				pet2(pet_id, visit_date, procedure_no, procedure_name) => primary: visit_date, procedure_no
+		2NF	pet(pet_id, pet_name, pet_type, pet_age, owner) => primary: pet_id
+				pet2(pet_id, visit_date, procedure_no) => primary: pet_id, visit_date
+				pet3(procedure_no, procedure_name)
+			=> kijken of alles dat geen key is afhankelijk is van de keys (in dit geval is de proc_name enkel afh van de no, niet van de visit date)
+		3NF	2NF
+			=> niet sleutel-atribuut mogen niet afhankelijk zijn van ander niet-sleutel atribuut
+
+	normalise up to 3NF:
+		UNF 	invoice(invoice_id, date, customer, adress, (pet_name, procedure, amount))
+		1NF	invoice(invoice_id, date, customer, adress) => primary key: invoice_id
+				pet(invoice_id, pet_id, pet_name, procedure, amount) => primary key: pet_id
+		2NF	invoice(invoice_id, date, customer, adress)
+				pet(invoice_id, pet_id, procedure, amount)
+				pet2(pet_id, pet_name)
+		3NF	invoice(invoice_id, date, customer_id)
+				customer(customer_id, cust_stree, cust_city, cust_postcd)
+				pet(invoice_id, pet_id, procedure, amount)
+				pet2(pet_id, pet_name)
+
+	normalise up to 3NF:
+		UNF	test(company_name, symbol, headquarters, date, close_price)
+		1NF	test(company_name, symbol, headquarters, date, close_price) => primary key: symbol, date
+		2NF	test(symbol, company_name, headquarters) => primary: symbol
+				test2(symbol, date, close_price) => primary: symbol, date
+		3NF	test(symbol, company_name)
+				test2(symbol, date, close_price)
+				test3(company_name, headquarters)
+				
+	normalise up to BCNF:
+		UNF	Grade_report(StudNo,StudName,(Major,Adviser,(CourseNo,Ctitle,InstrucName,InstructLocn,Grade)))
+		1NF	Stud(StudNo, StudName) => StudNo
+				major(StudNo, major, advisor) => StudNo, major
+				course(StudNo, major, courseNo, cTitle, InstrucName, InstructLocn, Grade) => primary key: StudNo, major
+		2NF	Stud(StudNo, StudName)
+				major(StudNo, major, advisor)
+				student_course(StudNo, major, courseNo, grade)
+				course(courseNo, cTitle, InstrucName, InstructLocn)
+		3NF	Stud(StudNo, StudName)
+				major(StudNo, major, advisor)
+				student_course(StudNo, major, courseNo, grade)
+				course(courseNo, cTitle, InstrucName)
+				instr(InstrucName, InstructLocn)
+		BCNF	Stud(StudNo, StudName)
+				stud_maj(StudNo, major)
+				adv_maj(advisor, major)
+				student_course(StudNo, major, courseNo, grade)
+				course(courseNo, cTitle, InstrucName)
+				instr(InstrucName, InstructLocn)
+
+				
+ 

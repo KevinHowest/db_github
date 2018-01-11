@@ -1,0 +1,41 @@
+Oefening bioinf_testdb
+
+Find HOTAIR:
+SELECT gene_name, chromosome, seq_region_start, seq_region_end, (seq_region_end-seq_region_start+1) AS size FROM gene WHERE gene_name = 'HOTAIR';
+#+1 vb. positie 1-10 -> lijkt op lengte 9, maar is 10
+
+Find lincRNA:
+SELECT gene_name FROM gene WHERE chromosome = 14 and biotype = 'lincRNA' and status = "KNOWN" ORDER BY seq_region_start asc LIMIT 1;
+
+Genes prostate cancer:
+SELECT gene_name, description FROM gene WHERE description like '%prostate%cancer';
+
+Genes from x-chromosome:
+SELECT DISTINCT(gene_name)FROM gene WHERE chromosome='X' ORDER BY gene_name;  
+
+Extra:
+How many occurences does each biotype have in the gene table?
+SELECT biotype, count(*) FROM gene GROUP BY biotype;
+
+A mutation was found on chromosome 20, position 44002590. Which gene(s) have an overlap with this position
+SELECT gene_name FROM gene WHERE chromosome = 20 and 44002590 between seq_region_start and seq_region_end;
+
+Which chromosome has the second most genes?
+SELECT chromosome, count(*) AS freq FROM gene GROUP BY chromosome ORDER BY freq desc LIMIT 1 OFFSET 1;
+
+On which chromosome strand lie the most genes?
+SELECT seq_region_strand, count(seq_region_strand) AS freq FROM gene GROUP BY seq_region_strand ORDER BY freq desc LIMIT 1;
+
+What is the most common biotype for novel transcripts?
+SELECT biotype, count(*) as freq FROM transcript WHERE status='novel' GROUP BY biotype ORDER BY freq desc LIMIT 1;
+
+For each biotype with more than 10 known transcripts, give the lowest start position and the highest end position?
+SELECT biotype, min(seq_region_start), max(seq_region_end) FROM transcript WHERE status = "KNOWN" GROUP BY biotype HAVING count(*)>10;
+
+Laatste oefening
+SELECT count(*) FROM exon WHERE phase != end_phase;
+
+
+
+
+

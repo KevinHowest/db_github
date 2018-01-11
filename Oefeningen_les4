@@ -1,0 +1,24 @@
+What normal form is this?
+	2NF, want alles is afhankelijk van de key
+Convert to BCNF
+	3NF	video(title, serial)
+			serial(serial, director)
+			customer(memberno, name, addr)
+			hire(memberno, serial, date)
+	BCNF	video(title, serial)
+			serial(serial, director)
+			customer(memberno, name, addr)
+			hire(memberno, serial, date)
+
+Convert to BCNF
+	UNF	Drinkers(name, addr, beersLiked, manf, favBeer)
+	1NF	1NF met name als key
+	2NF	Drinkers(name_id, name, addr, favBeer)
+			beer(name_id, beerLiked, manf)
+		
+	3NF	Drinkers(name_id, name, addr, favBeer)
+			beer(name_id, beerLiked)
+			manf(beerLiked, manf)
+	BCNF 	3NF
+
+
